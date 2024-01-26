@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Cache-Control" content="no-cache">
+
+        <title>Modina Model Viz</title>
+
+
+        <style>
+            @font-face {
+                font-family: 'iconfont';
+                src: url('iconfont.ttf') format('truetype');
+            }
+
+            * {
+                user-select: none;
+            }
+
+            html, body {
+                overflow: hidden;
+                background-color: #000;
+            }
+
+            body {
+                margin: 0;
+                position: fixed;
+                width: 100%;
+                height: 100%;
+            }
+
+            canvas {
+              width: 700px;
+              height: 700px;
+              position: fixed;
+   top: 50%;
+   left: 67.5%;
+   transform: translate(-50%, -51%);
+    border: 1px solid #444;
+  //  background-color: #000;
+            }
+  #slider-container {
+    position: absolute;
+    left: 200px;
+    top: 200px; /* adjust the top value as needed */
+    width: 300px;
+
+    font-family: Helvetica;
+      color: #fff;
+  }
+
+  #slider-container input[type="range"] {
+     margin-bottom: 79px;
+    width: 100%;
+    height: 1px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #666;
+    border-radius: 1px;
+    outline: none;
+  }
+  #slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #555;
+    cursor: pointer;
+    border: none;
+  }
+  #slider-container input[type="range"]::-moz-range-thumb {
+    width: 3px;
+    height: 12px;
+    border-radius: 0%;
+    background-color: #999;
+    cursor: pointer;
+    border: none;
+  }
+  #slider-container {
+    position: relative;
+  }
+
+  #slider-container .slider-value {
+  position: absolute;
+  font-size: 12px;
+  color: #666;
+}
+
+  #slider1-value {
+    left: 315px;
+    top: -5px;
+  }
+
+  #slider2-value {
+    left: 315px;
+    top: 80px;
+  }
+
+  #slider3-value {
+    left: 315px;
+top: 167px;
+}
+#slider4-value {
+  left: 315px;
+top: 252px;
+}
+#slider5-value {
+  left: 315px;
+top: 338px;
+  }
+           </style>
+        <script>
+            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+            ga('create', 'UA-105392568-1', 'auto');
+            ga('send', 'pageview');
+        </script>
+        <script async src="https://www.google-analytics.com/analytics.js"></script>
+    </head>
+    <body>
+        <canvas></canvas>
+
+        <style>
+            /* Add these styles to decrease the size and change the color of the slider descriptions */
+            .slider-description {
+                font-size: 12px; /* Adjust the font size as needed */
+                color: #999;     /* Change the color to your preferred color */
+                margin-bottom: 25px; /* Add margin bottom for spacing between descriptions */
+            }
+        </style>
+
+  <div id="slider-container">
+     <span id="slider1-description" class="slider-description">Zoom</span>
+           <span id="slider1-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0" id="slider1" >
+          <span id="slider2-description" class="slider-description">Move on X position</span>
+          <span id="slider2-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0" id="slider2" >
+          <span id="slider3-description" class="slider-description">Mon on Y position</span>
+           <span id="slider3-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" id="slider3" >
+            <span id="slider4-description" class="slider-description">Time speed</span>
+          <span id="slider4-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0" id="slider4" >
+
+
+        <script>
+        function attachSliderListeners(sliderId) {
+        let sliderUsed = false;
+    const slider = document.getElementById(sliderId);
+
+    slider.addEventListener('input', (event) => {
+      sliderUsed = true;
+      const value = event.target.valueAsNumber;
+      // Call a function in script.js with the value as a parameter
+      gene(value,  sliderId);
+    });
+
+    slider.addEventListener('mousedown', () => {
+      sliderUsed = true;
+      // Call your function that needs to know whether the slider was used or not
+      gene2( sliderUsed);
+    });
+    document.addEventListener('mouseup', () => {
+  sliderUsed = false;
+  gene2(  sliderUsed);
+});
+}
+attachSliderListeners('slider1');
+attachSliderListeners('slider2');
+attachSliderListeners('slider3');
+attachSliderListeners('slider4');
+//attachSliderListeners('slider5');
+
+       </script>
+
+        <script src="./script.js"></script>
+    </body>
+</html>
