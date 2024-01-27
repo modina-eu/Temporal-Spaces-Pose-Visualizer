@@ -31,8 +31,8 @@ let pointers = [];
 let splatStack = [];
 let s1 = 0;
 let s2 = 0;
-let s3 = 0.5;
-let s4 = 0;
+let s3 = 0;
+let s4 = 0.5;
 let s5 = 0;
 let p1 = 0;
 pointers.push(new pointerPrototype());
@@ -289,6 +289,7 @@ const displayShaderSource = `
     void main () {
       vec2 uv =  vUv*(1.-s1);
       uv += vec2(s2,s3);
+      uv.x *= 9./16.;
       float ti = ti * 60.*s4;
 			float _resx2 = 64.;
 			float itn = floor(_resx2 / 12.);
