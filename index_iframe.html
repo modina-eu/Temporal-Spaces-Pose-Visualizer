@@ -2,9 +2,11 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <!-- <meta http-equiv="Cache-Control" content="no-cache"> -->
+        <meta http-equiv="Cache-Control" content="no-cache">
 
         <title>Modina Model Viz</title>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"></script> -->
+        <script src="https://unpkg.com/ml5@0.5.0/dist/ml5.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.8/dist/tf.min.js"></script>
 
         <style>
@@ -18,7 +20,7 @@
             }
 
             html, body {
-                overflow: visable;
+                overflow: hidden;
                 background-color: #000;
             }
 
@@ -30,21 +32,14 @@
             }
 
             #visuals-canvas {
-                width: 50%;
-                height: 50%;
+                width: 700px;
+                height: 700px;
                 position: fixed;
-                top: 55%;
-                left: 55%;
+                top: 50%;
+                left: 67.5%;
                 transform: translate(-50%, -51%);
                 border: 1px solid #444;
                 background-color: #000;
-            }
-            #myFrame{
-                position: fixed;
-                top: 55%;
-                left: 55%;
-                transform: translate(-50%, -51%);
-                /* border: 1px solid #444; */
             }
 
             #audio-canvas {
@@ -61,14 +56,14 @@
             #slider-container {
                 position: absolute;
                 left: 200px;
-                top: 10px; /* adjust the top value as needed */
-                width: 200px;
+                top: 100px; /* adjust the top value as needed */
+                width: 300px;
                 font-family: Helvetica;
                 color: #fff;
             }
 
             #slider-container input[type="range"] {
-                margin-bottom: 20px;
+                margin-bottom: 80px;
                 width: 100%;
                 height: 1px;
                 -webkit-appearance: none;
@@ -115,22 +110,22 @@
 
             #slider2-value {
                 left: 315px;
-                /* top: 105px; */
+                top: 105px;
             }
 
             #slider3-value {
                 left: 315px;
-                /* top: 210px; */
+                top: 210px;
             }
 
             #slider4-value {
                 left: 315px;
-                /* top: 315px; */
+                top: 315px;
             }
 
             #slider5-value {
                 left: 315px;
-                /* top: 420px; */
+                top: 420px;
             }
 
             /* Add these styles to decrease the size and change the color of the slider descriptions */
@@ -177,20 +172,6 @@
     background-color: #222;
 
 }
-img {
-    position: absolute;
-    /* top: 39%; */
-    left: 35%;
-    transform: translate(0%, -150%);
-    /* align: center; */
-    width: 150px;
-    height: 150px;
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0 auto;
-    border: 5px solid white; /* External border for each image */
-    box-sizing: border-box; /* Include border in the total width and height */
-}
         </style>
         <script>
             window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -200,6 +181,8 @@ img {
         <script async src="https://www.google-analytics.com/analytics.js"></script>
     </head>
     <body>
+
+
         <div class="instruction-text">!!!Click on the page after the generation of the texture to activate the sound, reload the page to regenerate a new model texture</div>
         <canvas id="visuals-canvas"></canvas>
         <canvas id="audio-canvas"></canvas>
@@ -208,10 +191,10 @@ img {
             <span id="slider1-description" class="slider-description">Zoom</span>
             <span id="slider1-value" class="slider-value"></span>
             <input type="range" min="-0.5" max="1" step="0.01" value="0.0" id="slider1" >
-            <span id="slider2-description" class="slider-description">X position</span>
+            <span id="slider2-description" class="slider-description">Move on X position</span>
             <span id="slider2-value" class="slider-value"></span>
             <input type="range" min="-1" max="1" step="0.01" value="0.0" id="slider2" >
-            <span id="slider3-description" class="slider-description">Y position</span>
+            <span id="slider3-description" class="slider-description">Mon on Y position</span>
             <span id="slider3-value" class="slider-value"></span>
             <input type="range" min="-1" max="1" step="0.01" value="0." id="slider3" >
             <span id="slider4-description" class="slider-description">Time speed</span>
@@ -265,34 +248,24 @@ img {
             attachSliderListeners('slider4');
             attachSliderListeners('slider5');
         </script>
+
         <script src="./script.js"></script>
 
-        <iframe id="myFrame" style="margin-bottom: 30px; overflow: visable; width: 50%; height: 50%"  scrolling="yes" frameborder="0"
-        src="http://localhost:8080/cam.html" sandbox="allow-same-origin allow-scripts" allow="camera http://localhost:8080/cam.html" autoplay muted/></iframe>
-
-        <!-- <img id="incputTexture" src="Capture/capture0001.png" alt="abstract texture" width="200" height="200"> -->
-        <!-- <img id="imageContainer" src="" alt="abstract texture" width="200" height="200"> -->
-        <div id="imageContainer"></div>
-
-        <script>
-        // document.getElementById("inputTexture").src='Capture/capture0005.png'
-
-        // document.addEventListener("click", getFromCam);
-        function getFromCam(){
-            var iframe = document.getElementById("myFrame");
-            iframe.contentWindow.postMessage('requesting pose', "*");
-        }
-        setInterval(getFromCam, 4000);
-
-        window.addEventListener('message', function(event) {
-            // console.log(event.data); // Message received from child
-            pose = event.data
-          });
-        </script>
+        <!-- <iframe id="myFrame" style="width: 640px; height: 360px; overflow: hidden; .nav: display: none"  scrolling="yes" frameborder="0"
+        src="http://localhost:8080/cam.html" sandbox="allow-same-origin allow-scripts" allow="camera http://localhost:8080/cam.html" autoplay muted/></iframe> -->
 
         <div id="footer">
       This page was created within the frame of Temporal Spaces as part of <a href="https://modina.eu/">@modina.eu</a>
       co-funded by the European Union - Special thanks to <a href="https://github.com/andreianmatos">https://github.com/andreianmatos</a> for the creation of the texture generator.
   </div>
+  <!-- <script src="https://unpkg.com/ml5@0.5.0/dist/ml5.min.js"></script> -->
+  <script>
+    // var iframe = document.getElementById("myFrame");
+    // console.log("iframe")
+    // iframe.contentWindow.postMessage('Hello from parent!', 'http://localhost:8080/cam.html');
+    // var elmnt = iframe.contentWindow.document.getElementByID("nav")[0];
+    // elmnt.style.display = "none";
+  </script>
+  <!-- <script src="sketch.js"></script> -->
     </body>
 </html>

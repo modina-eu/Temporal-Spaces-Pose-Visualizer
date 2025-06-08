@@ -10,7 +10,7 @@ let pose;
 let skeleton;
 
 function setup() {
-  // createCanvas(640, 480);
+  createCanvas(320, 240);
   video = createCapture(VIDEO);
   video.hide();
   poseNet = ml5.poseNet(video, modelLoaded);
@@ -31,6 +31,8 @@ function modelLoaded() {
 }
 
 function draw() {
+  scale(0.5,0.5)
+  background(0,0,0);
   image(video, 0, 0);
 
   if (pose) {
@@ -38,7 +40,7 @@ function draw() {
     let eyeL = pose.leftEye;
     let d = dist(eyeR.x, eyeR.y, eyeL.x, eyeL.y);
     // fill(255, 0, 0);
-    // ellipse(pose.nose.x, pose.nose.y, d);
+    ellipse(pose.nose.x, pose.nose.y, d);
     fill(0, 0, 255);
     // ellipse(pose.rightWrist.x, pose.rightWrist.y, 32);
     // ellipse(pose.leftWrist.x, pose.leftWrist.y, 32);
@@ -59,3 +61,14 @@ function draw() {
     }
   }
 }
+
+window.addEventListener('message', event => {
+    // console.log(event.data);
+    // console.log(pose);
+    window.parent.postMessage(pose, "*");
+    // if (event.origin === 'https://your-first-site.example') {
+    //     console.log(event.data);
+    // } else {
+    //     return;
+    // }
+});

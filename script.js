@@ -38,12 +38,18 @@ let tecreate = 0;
 let useModelTexture = false;
 const canvas2 = document.getElementById('audio-canvas');
 const gl2 = canvas2.getContext('webgl2');
+let decoder = null;
+let encoder = null;
+let generatedImages = [];
+
 async function loadModels() {
     try {
         // Load the encoder and decoder models
-        const decoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/decoder/model.json');
-        const encoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/encoder/model.json');
-
+        if (!encoder || !decoder) {
+          console.log("loding models")
+          decoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/decoder/model.json');
+          encoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/encoder/model.json');
+        }
         // Update the latent dimension
         const latentDim = 4;
         const numExamplesToGenerate = 1; // Change the desired number of examples
@@ -51,15 +57,61 @@ async function loadModels() {
         const loaded_model = new CVAE(latentDim, encoder, decoder);
 
         // Generate a random vector for each example and load the model texture
-
             const randomVectorForGeneration = tf.randomNormal([1, latentDim]);
-            const sample = await loaded_model.sample(randomVectorForGeneration);
+            const values = await randomVectorForGeneration.array();
+            // vec = [
+            //   -0.4324505627155304,
+            //   0.8095831871032715,
+            //   0.19554875791072845,
+            //   0.029588615521788597
+            // ]
+            vec = [pose.score, pose.score, pose.score, pose.score]
+            const newTensor = tf.tensor(values, [1, latentDim]);  // shape must match size
+            const sample = await loaded_model.sample(newTensor);
+            console.log('sample:',sample)
+
             modelTexture = await generateImageTexture(loaded_model, sample);
             modelTextures = await generateImageTextures(loaded_model, sample);
             console.log('modelTextures:', modelTextures);
 
         // Set tecreate to 1 after modelTextures is assigned a value
         tecreate = 1;
+
+        // !! update here the latent dim
+        // const latentDim = 4;
+        // const numExamplesToGenerate = 1; // Change the desired number of examples
+        generatedImages = [];
+
+        for (let i = 0; i < numExamplesToGenerate; i++) {
+          const randomVectorForGeneration = tf.randomNormal([1, latentDim]); // Generate a new random vector for each example
+          const sample = await loaded_model.sample(randomVectorForGeneration);
+          console.log("a");
+          const generatedImage = await generateImage(loaded_model, sample);
+          console.log(generatedImage);
+          generatedImages.push(generatedImage);
+        }
+        // Display the generated images
+        const imageContainer = document.getElementById('imageContainer');
+        generatedImages.slice(1);
+        generatedImages.forEach((imageData, index) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = imageData.width;
+            canvas.height = imageData.height;
+            const context = canvas.getContext('2d');
+            context.putImageData(imageData, 0, 0);
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.alt = `Generated Image ${index + 1}`;
+            img.classList.add('generatedImage');
+            // console.log(img);
+            if (imageContainer.hasChildNodes()) {
+              imageContainer.removeChild(imageContainer.children[0]);
+            }
+            imageContainer.appendChild(img);
+
+            fragesTexture = createTextureAsync(img.src);
+        });
 
     } catch (error) {
         console.error('Error loading models:', error);
@@ -737,6 +789,7 @@ function CHECK_FRAMEBUFFER_STATUS () {
 
 let fragesTexture = createTextureAsync('Capture/capture0000.png');
 let fragesTexture2 = createTextureAsyncs('Capture/capture0000.png');
+
 function loadTextureWithSliderValue(value) {
     let textureUrl = 'Capture/capture' + pad(value, 4) + '.png'; // Assuming your texture files are named as capture0000.png, capture0001.png, etc.
 
@@ -1115,10 +1168,21 @@ else{
     node.loop = false;
     return node;
   }
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+  let video;
+  let poseNet;
+  let pose;
+  let skeleton;
   let audioCreated = false;
   let audioNode = null; // Define audioNode in the outer scope
 
   addEventListener('click', async () => {
+    // document.getElementById("inputTexture").src='Capture/capture0149.png'
+    // console.log(pose.keypoints)
       if (tecreate > 0) {
           if (audioNode) {
               // If audio node exists, stop and destroy it
@@ -1134,7 +1198,85 @@ else{
           console.log('Texture is not generated yet.');
       }
   });
-  document.getElementById('myButton').addEventListener('click', function() {
-    useModelTexture = !useModelTexture;
+  // document.getElementById('myButton').addEventListener('click', function() {
+  //   let textureUrl = 'Capture/capture' + pad(getRandomInt(381), 4) + '.png';
+  //   document.getElementById("inputTexture").src=textureUrl
+  //   useModelTexture = !useModelTexture;
+  // });
 
-});
+async function loadModelsPart2() {
+    // Load the encoder and decoder models
+    const decoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/decoder/model.json');
+    const encoder = await tf.loadGraphModel('model_json/latent_dim_4/augmented_captures/horizontal_flip/250_epochs/encoder/model.json');
+
+    // !! update here the latent dim
+    const latentDim = 4;
+    const numExamplesToGenerate = 1; // Change the desired number of examples
+    const generatedImages = [];
+
+    const loaded_model = new CVAE(latentDim, encoder, decoder);
+
+    for (let i = 0; i < numExamplesToGenerate; i++) {
+      const randomVectorForGeneration = tf.randomNormal([1, latentDim]); // Generate a new random vector for each example
+      const sample = await loaded_model.sample(randomVectorForGeneration);
+      console.log("a");
+      const generatedImage = await generateImage(loaded_model, sample);
+      console.log(generatedImage);
+      generatedImages.push(generatedImage);
+    }
+    // Display the generated images
+    const imageContainer = document.getElementById('imageContainer');
+    generatedImages.slice(1);
+    generatedImages.forEach((imageData, index) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        const context = canvas.getContext('2d');
+        context.putImageData(imageData, 0, 0);
+
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL();
+        img.alt = `Generated Image ${index + 1}`;
+        img.classList.add('generatedImage');
+        // console.log(img);
+        imageContainer.appendChild(img);
+    });
+}
+
+async function generateImage(model, sample) {
+    const [mean, logvar] = await model.encode(sample);
+    const z = model.reparameterize(mean, logvar);
+    const prediction = await model.sample(z);
+    // Convert the tensor to pixels
+    const pixelsTensor = prediction.squeeze();
+    const pixels = await tf.browser.toPixels(pixelsTensor);
+
+    // Create an ImageData object from the pixel data
+    const image = new ImageData(new Uint8ClampedArray(pixels), pixelsTensor.shape[1], pixelsTensor.shape[0]);
+
+    return image;
+}
+
+// Utility function to convert ArrayBuffer to Base64
+function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+}
+
+// loadModelsPart2();
+
+function updateSelectedTexture(){
+  loadModels()
+  if (pose){
+    console.log(pose.score);
+  }
+  // let textureUrl = 'Capture/capture' + pad(getRandomInt(381), 4) + '.png';
+  // document.getElementById("inputTexture").src=textureUrl
+}
+
+setInterval(updateSelectedTexture, 4000);
