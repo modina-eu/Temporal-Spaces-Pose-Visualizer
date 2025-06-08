@@ -110,7 +110,8 @@ async function loadModels() {
             }
             imageContainer.appendChild(img);
 
-            fragesTexture = createTextureAsync(img.src);
+            fragesTexture = createTextureAsync(imageData);
+            fragesTexture = createTextureAsync(imageData);
         });
 
     } catch (error) {
