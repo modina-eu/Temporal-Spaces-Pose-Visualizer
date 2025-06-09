@@ -130,7 +130,12 @@
 
             #slider5-value {
                 left: 315px;
+                visibility: hidden;
                 /* top: 420px; */
+            }
+
+            #slider5, #slider5-description {
+              visibility: hidden;
             }
 
             /* Add these styles to decrease the size and change the color of the slider descriptions */
@@ -219,9 +224,9 @@ img {
             <input type="range" min="0" max="1" step="0.01" value="0.1" id="slider4" >
             <span id="slider5-description" class="slider-description">Number of The texture</span>
             <span id="slider5-value" class="slider-value"></span>
-            <input type="range" min="0" max="381" step="1.0" value="0.0" id="slider5" >
+            <input type="range" min="0" max="381" step="1.0" value="0.0" id="slider5" type="hidden" >
         </div>
-         <button id="myButton">Select recorded Texture</button>
+         <button id="myButton">Generate Texture</button>
          <script>
     // Get the button element
     const button = document.getElementById('myButton');
@@ -269,12 +274,14 @@ img {
 
         <iframe id="myFrame" style="margin-bottom: 30px; overflow: visable; width: 50%; height: 50%"  scrolling="yes" frameborder="0"
         src="http://localhost:8080/cam.html" sandbox="allow-same-origin allow-scripts" allow="camera http://localhost:8080/cam.html" autoplay muted/></iframe>
-
-        <!-- <img id="incputTexture" src="Capture/capture0001.png" alt="abstract texture" width="200" height="200"> -->
-        <!-- <img id="imageContainer" src="" alt="abstract texture" width="200" height="200"> -->
         <div id="imageContainer"></div>
 
         <script>
+        if (!window.location.href.includes("localhost")){
+          let iFrameURL = window.location.href + "cam.html";
+          document.getElementById("myFrame").src = iFrameURL;
+          console.log(iFrameURL);
+        }
         // document.getElementById("inputTexture").src='Capture/capture0005.png'
 
         // document.addEventListener("click", getFromCam);
